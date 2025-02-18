@@ -1,6 +1,5 @@
-import Dog from './Dog.js';
-import Match from "./Match.js";
-import Message from "./Message.js";
-import User from "./User.js";
+import { Dog } from './Dog.js';
+import { Match } from "./Match.js";
+import {User} from "./User.js";
 
-export { Dog, Match, Message, User };
+export { Dog, Match, User };

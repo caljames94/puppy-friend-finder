@@ -1,72 +1,119 @@
-const typeDefs = `
-    type User {
-        _id: ID!
-        name: String!
-        email: String!
-        password: String
-        dog: Dog!
-    }
-    
-    type Dog {
-        _id: ID
-        name: String
-        age: Int
-        breed: String
-        personality: String
-        profilePicture: String
-        suburb: String
-        owner: User
-        friends: [Dog]
-        matches: [Match]
-    }
-    
-    type Match {
-        _id: ID!
-        sender: Dog!
-        recipient: Dog!
-        status: MatchStatus!
-        isFriend: Boolean!
-        createdAt: String!
-    }
-    
-    enum MatchStatus {
-        PENDING
-        ACCEPTED
-        REJECTED
-    }
-    
-    type Message {
-        _id: ID!
-        sender: User!
-        recipient: User!
-        content: String!
-        createdAt: String!
-    }
-    
-    type Auth {
-        token: ID!
-        user: User
-    }
-    
-    type Query {
-        me: User
-        dog(_id: ID!): Dog
-        dogs: [Dog!]!
-        matches: [Match!]!
-        friends: [Dog!]!
-        messages(friendId: ID!): [Message!]!
-    }
-    
-    type Mutation {
-        login(email: String!, password: String!): Auth
-        addUser(name: String!, email: String!, password: String!): Auth
-        addDog(name: String!, age: Int!, breed: String!, personality: String, profilePicture: String, suburb: String): Dog
-        updateDog(_id: ID!, name: String, age: Int, breed: String, personality: String, profilePicture: String, suburb: String): Dog
-        createMatch(recipientId: ID!): Match
-        updateMatchStatus(_id: ID!, status: MatchStatus!): Match
-        removeFriend(friendId: ID!): Dog
-        sendMessage(recipientId: ID!, content: String!): Message
-    }
-`;
+import { gql } from 'apollo-server-express';
 
-export default typeDefs;
+export const typeDefs = gql`
+  scalar DateTime
+
+  enum MatchStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    dog: Dog
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Dog {
+    id: ID!
+    name: String!
+    age: Int!
+    breed: String!
+    personality: [String!]!
+    profilePicture: String!
+    suburb: String!
+    owner: User!
+    pendingMatches: [Match!]!
+    confirmedMatches: [Match!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Match {
+    id: ID!
+    dogA: Dog!
+    dogB: Dog!
+    dogAStatus: MatchStatus!
+    dogBStatus: MatchStatus!
+    isMatched: Boolean!
+    isPending: Boolean!
+    isRejected: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+  }
+
+  input UpdateUserInput {
+    name: String
+    email: String
+    password: String
+  }
+
+  input CreateDogInput {
+    name: String!
+    age: Int!
+    breed: String!
+    personality: [String!]!
+    profilePicture: String!
+    suburb: String!
+  }
+
+  input UpdateDogInput {
+    name: String
+    age: Int
+    breed: String
+    personality: [String!]
+    profilePicture: String
+    suburb: String
+  }
+
+  type Query {
+    # User queries
+    me: User
+    getUser(id: ID!): User
+    
+    # Dog queries
+    getDog(id: ID!): Dog
+    getDogsBySuburb(suburb: String!): [Dog!]!
+    getDogsForMatching(dogId: ID!): [Dog!]!
+    
+    # Match queries
+    getMatch(id: ID!): Match
+    getMatchesByDog(dogId: ID!): [Match!]!
+    getPendingMatches(dogId: ID!): [Match!]!
+  }
+
+  type Mutation {
+    # User mutations
+    register(input: CreateUserInput!): User!
+    login(email: String!, password: String!): AuthPayload!
+    updateUser(id: ID!, input: UpdateUserInput!): User!
+    
+    # Dog mutations
+    createDog(input: CreateDogInput!): Dog!
+    updateDog(id: ID!, input: UpdateDogInput!): Dog!
+    deleteDog(id: ID!): Boolean!
+    
+    # Match mutations
+    createMatch(dogA: ID!, dogB: ID!): Match!
+    updateMatchStatus(matchId: ID!, dogId: ID!, status: MatchStatus!): Match!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
+  type Subscription {
+    matchUpdated(dogId: ID!): Match!
+  }
+`;
