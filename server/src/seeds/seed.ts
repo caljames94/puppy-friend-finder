@@ -1,88 +1,81 @@
-import db from '../config/connection.js';
-import { Dog, Match, Message, User } from '../models/index.js';
-import cleanDB from './cleanDB.js';
+import {Schema} from 'mongoose';
+import db from '../config/connection.js'
+import { User, Dog, Match } from '../models/index.js';
+import { IUser } from '../models/User.js';
+import { MatchStatus } from '../models/Match.js';
+import bcrypt from 'bcrypt';
 
-const seedDatabase = async (): Promise<void> => {
+
+const seedDatabase = async () => {
   try {
+    //Connect to the database
     await db();
-    await cleanDB();
 
-    // Create 10 users with dogs
-    const users = [];
-    const dogs = [];
-    for (let i = 0; i < 10; i++) {
-      const user = await User.create({
-        name: `User ${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        password: 'password123'
+    // Clear existing data
+    await User.deleteMany({});
+    await Dog.deleteMany({});
+    await Match.deleteMany({});
+
+    // Create Users
+    const users: IUser[] = [];
+    for (let i = 1; i <= 15; i++) {
+      const user = new User({
+        name: `user${i}`,
+        email: `user${i}@example.com`,
+        password: await bcrypt.hash('password123', 10),
       });
+      await user.save();
       users.push(user);
+    }
 
-      const dog = await Dog.create({
-        name: `Dog ${i + 1}`,
+    // Create Dogs
+    const dogs = [];
+    const breeds = ['Labrador', 'Golden Retriever', 'German Shepherd', 'Bulldog', 'Poodle', 'Beagle', 'Rottweiler', 'Boxer', 'Dachshund', 'Siberian Husky'];
+    const suburbs = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Newcastle', 'Canberra', 'Wollongong', 'Hobart'];
+    for (let i = 0; i < users.length; i++) {
+      const dog = new Dog({
+        name: `Dog${i + 1}`,
         age: Math.floor(Math.random() * 10) + 1,
-        breed: `Breed ${i + 1}`,
-        personality: `Friendly and playful ${i + 1}`,
+        breed: breeds[Math.floor(Math.random() * breeds.length)],
+        personality: ['Friendly', 'Playful', 'Energetic', 'Calm', 'Shy', 'Independent', 'Social'][Math.floor(Math.random() * 7)],
         profilePicture: `https://example.com/dog${i + 1}.jpg`,
-        suburb: `Suburb ${i + 1}`,
-        owner: user._id
+        suburb: suburbs[Math.floor(Math.random() * suburbs.length)],
+        owner: users[i]._id,
       });
+      await dog.save();
       dogs.push(dog);
 
-      // Update user with dog reference
-      await User.findByIdAndUpdate(user._id, { dog: dog._id });
+      // Assign the dog to the user
+      users[i].dog = dog._id as unknown as Schema.Types.ObjectId;
+      await users[i].save();
     }
 
-    // Create 4 matches with different statuses
-    const matchStatuses = ['pending', 'accepted', 'rejected', 'accepted'];
-    const matches = [];
-    for (let i = 0; i < 4; i++) {
-      const sender = dogs[i];
-      const recipient = dogs[i + 5]; // Pair dogs from different halves of the array
-      const match = await Match.create({
-        sender: sender._id,
-        recipient: recipient._id,
-        status: matchStatuses[i],
-        createdAt: new Date()
-      });
-      matches.push(match);
+    // Create Matches
+    const matches = [
+      { dogA: dogs[0]._id, dogB: dogs[1]._id, dogAStatus: MatchStatus.ACCEPTED, dogBStatus: MatchStatus.ACCEPTED },
+      { dogA: dogs[2]._id, dogB: dogs[3]._id, dogAStatus: MatchStatus.ACCEPTED, dogBStatus: MatchStatus.PENDING },
+      { dogA: dogs[4]._id, dogB: dogs[5]._id, dogAStatus: MatchStatus.PENDING, dogBStatus: MatchStatus.PENDING },
+      { dogA: dogs[6]._id, dogB: dogs[7]._id, dogAStatus: MatchStatus.REJECTED, dogBStatus: MatchStatus.ACCEPTED },
+      { dogA: dogs[8]._id, dogB: dogs[9]._id, dogAStatus: MatchStatus.ACCEPTED, dogBStatus: MatchStatus.ACCEPTED },
+    ];
 
-      // Update dogs with the new match
-      await Dog.findByIdAndUpdate(sender._id, { $push: { matches: match._id } });
-      await Dog.findByIdAndUpdate(recipient._id, { $push: { matches: match._id } });
-
-      // If the match is accepted, add them as friends
-      if (matchStatuses[i] === 'accepted') {
-        await Dog.findByIdAndUpdate(sender._id, { $push: { friends: recipient._id } });
-        await Dog.findByIdAndUpdate(recipient._id, { $push: { friends: sender._id } });
-      }
+    for (const matchData of matches) {
+      const match = new Match(matchData);
+      await match.save();
     }
 
-    // Create 2 messages for each accepted match
-    for (const match of matches) {
-      if (match.status === 'accepted') {
-        const sender = await User.findOne({ dog: match.sender });
-        const recipient = await User.findOne({ dog: match.recipient });
-
-        if (sender && recipient) {
-          for (let i = 0; i < 2; i++) {
-            await Message.create({
-              sender: sender._id,
-              recipient: recipient._id,
-              content: `Message ${i + 1} from ${sender.name} to ${recipient.name}`,
-              createdAt: new Date()
-            });
-          }
-        }
-      }
-    }
-
-    console.log('Seeding completed successfully!');
+    console.log('Database seeded successfully!');
     process.exit(0);
   } catch (error) {
     console.error('Error seeding database:', error);
     process.exit(1);
   }
-}
+};
+
+// Handle any unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Promise Rejection:', error);
+  process.exit(1);
+});
 
 seedDatabase();

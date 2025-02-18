@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { MatchStatus } from './Match';
+import { MatchStatus } from './Match.js';
 
 export interface IDog extends Document {
   name: string;

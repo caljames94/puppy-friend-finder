@@ -5,7 +5,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  dog: Schema.Types.ObjectId;
+  dog?: Schema.Types.ObjectId;
   isCorrectPassword(password: string): Promise<boolean>;
 }
 
