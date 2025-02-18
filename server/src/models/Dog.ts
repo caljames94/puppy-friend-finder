@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
 
 interface IDog extends Document {
   name: string;
@@ -7,9 +7,9 @@ interface IDog extends Document {
   personality: string;
   profilePicture: string;
   suburb: string;
-  owner: Schema.Types.ObjectId;
-  matches: Schema.Types.ObjectId[];
-  friends: Schema.Types.ObjectId[];
+  owner: Types.ObjectId;
+  matches: Types.ObjectId[];
+  friends: Types.ObjectId[];
 }
 
 const dogSchema = new Schema<IDog>({
@@ -26,9 +26,18 @@ const dogSchema = new Schema<IDog>({
     type: String,
     required: true,
   },
-  personality: String,
-  profilePicture: String,
-  suburb: String,
+  personality: {
+    type: String,
+    required: true,
+  },
+  profilePicture: {
+    type: String,
+    required: true,
+  },
+  suburb: {
+    type: String,
+    required: true
+  },
   owner: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -36,7 +45,7 @@ const dogSchema = new Schema<IDog>({
   },
   matches: [{
     type: Schema.Types.ObjectId,
-    ref: 'Dog',
+    ref: 'Match',
   }],
   friends: [{
     type: Schema.Types.ObjectId,

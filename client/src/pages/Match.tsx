@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_DOGS } from '../utils/queries.js';
-import DogCard from '../components/DogCardComponents.js';
+import DogCard from '../components/DogCardComponent.js';
 
 const Match: React.FC = () => {
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
@@ -17,7 +17,7 @@ const Match: React.FC = () => {
     breed: dog.breed,
     imageUrl: dog.image,
     owner: {
-      username: dog.owner.username
+      name: dog.owner.name
     }
   }));
 

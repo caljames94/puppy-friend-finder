@@ -8,7 +8,7 @@ interface DogProfile {
   breed: string;
   imageUrl: string;
   owner: {
-    username: string;
+    name: string;
   };
 }
 
@@ -88,7 +88,7 @@ const DogCard: React.FC<DogCardProps> = ({ dog, onSwipeLeft, onSwipeRight }) => 
                 <span className="age">{dog.age}</span>
               </div>
               <p className="breed">{dog.breed}</p>
-              <p className="owner">Owner: {dog.owner.username}</p>
+              <p className="owner">Owner: {dog.owner.name}</p>
             </div>
           </div>
         </div>

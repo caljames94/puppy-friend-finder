@@ -3,7 +3,7 @@ import { type JwtPayload, jwtDecode } from 'jwt-decode';
 // Extending the JwtPayload interface to include additional data fields specific to the application.
 interface ExtendedJwt extends JwtPayload {
   data:{
-    username:string,
+    name:string,
     email:string,
     id:string
   }
@@ -55,7 +55,7 @@ class AuthService {
   // This method logs out the user by removing the token from localStorage and redirecting to the home page.
   logout() {
     localStorage.removeItem('id_token');
-    window.location.assign('/');
+    window.location.assign('/login');
   }
 }
 
