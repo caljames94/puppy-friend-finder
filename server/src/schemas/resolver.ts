@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { User, IUser } from "../models/User.js";
 import { Dog, IDog } from "../models/Dog.js";
 import { Match, IMatch, MatchStatus } from "../models/Match.js";
+// import dotenv from "dotenv";
 
 export interface Context {
   user?: {
@@ -73,7 +74,6 @@ export const resolvers: IResolvers = {
       if (!dog) throw new UserInputError("Dog not found");
 
       return await Dog.find({
-        suburb: dog.suburb,
         _id: { $ne: dogId },
       }).populate("owner");
     },
@@ -86,7 +86,13 @@ export const resolvers: IResolvers = {
     getMatchesByDog: async (_, { dogId }: { dogId: string }) => {
       return await Match.find({
         $or: [{ dogA: dogId }, { dogB: dogId }],
-      }).populate("dogA dogB");
+      }).populate({
+        path: "dogA dogB",
+        populate: {
+          path: "owner",
+          model: "User",
+        }
+        });
     },
 
     getPendingMatches: async (_, { dogId }: { dogId: string }) => {
@@ -95,13 +101,19 @@ export const resolvers: IResolvers = {
           { dogA: dogId, dogAStatus: MatchStatus.PENDING },
           { dogB: dogId, dogBStatus: MatchStatus.PENDING },
         ],
-      }).populate("dogA dogB");
-    },
+      }).populate({
+        path: "dogA dogB",
+        populate: {
+          path: "owner",
+          model: "User",
+        }
+        });
+    }
   },
 
   Mutation: {
     // User mutations
-    register: async (_, { input }: { input: CreateUserInput }) => {
+    register: async (_:any, { input }: { input: CreateUserInput }) => {
       const existingUser = await User.findOne({ email: input.email });
       if (existingUser) {
         throw new UserInputError("Email already registered");
@@ -111,9 +123,7 @@ export const resolvers: IResolvers = {
       return await user.save();
     },
 
-    login: async (
-      _,
-      { email, password }: { email: string; password: string }
+    login: async ( _:any, { email, password }: { email: string; password: string }
     ): Promise<AuthPayload> => {
       const user = await User.findOne({ email });
       if (!user) {
@@ -135,7 +145,7 @@ export const resolvers: IResolvers = {
     },
 
     updateUser: async (
-      _,
+      _:any,
       { id, input }: { id: string; input: UpdateUserInput },
       { user }: Context
     ) => {
@@ -147,7 +157,7 @@ export const resolvers: IResolvers = {
 
     // Dog mutations
     createDog: async (
-      _,
+      _:any,
       { input }: { input: CreateDogInput },
       { user }: Context
     ) => {
@@ -165,7 +175,7 @@ export const resolvers: IResolvers = {
     },
 
     updateDog: async (
-      _,
+      _:any,
       { id, input }: { id: string; input: UpdateDogInput },
       { user }: Context
     ) => {
@@ -181,7 +191,7 @@ export const resolvers: IResolvers = {
       );
     },
 
-    deleteDog: async (_, { id }: { id: string }, { user }: Context) => {
+    deleteDog: async (_:any, { id }: { id: string }, { user }: Context) => {
       if (!user) throw new AuthenticationError("Not authenticated");
 
       const dog = await Dog.findById(id);
@@ -196,7 +206,15 @@ export const resolvers: IResolvers = {
     },
 
     // Match mutations
-    createMatch: async (_, { dogA, dogB }: { dogA: string; dogB: string }) => {
+    createMatch: async (_:any, { dogA, dogB }: { dogA: string; dogB: string }) => {
+
+      const dogAExists = await Dog.findById(dogA);
+      const dogBExists = await Dog.findById(dogB);
+    
+      if (!dogAExists || !dogBExists) {
+        throw new UserInputError("One or both dogs not found");
+      }
+
       const match = new Match({
         dogA,
         dogB,
@@ -208,7 +226,7 @@ export const resolvers: IResolvers = {
     },
 
     updateMatchStatus: async (
-      _,
+      _:any,
       {
         matchId,
         dogId,
@@ -227,6 +245,24 @@ export const resolvers: IResolvers = {
       }
 
       return (await match.save()).populate("dogA dogB");
+    },
+
+    deleteMatch: async (_: any, { matchId }: { matchId: string }, { user }: Context) => {
+      if (!user) throw new AuthenticationError("Not authenticated");
+    
+      const match = await Match.findById(matchId);
+      if (!match) throw new UserInputError("Match not found");
+    
+      const userDog = await Dog.findOne({ owner: user.id });
+      if (!userDog) throw new AuthenticationError("User does not own a dog");
+    
+      if (match.dogA.toString() !== userDog.id && match.dogB.toString() !== userDog.id) {
+        throw new AuthenticationError("Not authorized to delete this match");
+      }
+    
+      await Match.findByIdAndDelete(matchId);
+    
+      return { success: true, message: "Match successfully deleted"  };
     },
   },
 
