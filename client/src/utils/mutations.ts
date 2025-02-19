@@ -22,3 +22,16 @@ export const LOGIN_USER = gql`
   }
 `;
 
+export const REGISTER = gql`
+  mutation addProfile($name: String!, $email: String!, $password: String!) {
+    addProfile(name: $name, email: $email, password: $password) {
+      token
+      profile {
+        _id
+        name
+        email
+      }
+    }
+  }
+`;
+

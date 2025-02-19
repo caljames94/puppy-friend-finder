@@ -7,6 +7,7 @@ import Match from './pages/Match.tsx'
 import ErrorPage from './pages/Error.tsx'
 import MatchManagement from './pages/MatchManagement.tsx';
 import Login from './pages/Login.tsx';
+import CreateProfile from './pages/CreateProfile.tsx';
 
 const router = createBrowserRouter([
   {
@@ -19,11 +20,15 @@ const router = createBrowserRouter([
       element: <Match />
       },
       {
-        path: 'login',
+        path: '/login',
         element: <Login />
       },
       {
-        path: "matches",
+        path: '/create-profile',
+        element: <CreateProfile/>
+      },
+      {
+        path: '/matches',
         element: <MatchManagement/>
       }
     ]
