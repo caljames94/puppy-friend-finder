@@ -56,8 +56,15 @@ export const resolvers: IResolvers = {
       return await User.findById(user.id);
     },
 
-    getUser: async (_, { id }: { id: string }) => {
-      return await User.findById(id);
+    getUser: async (_: any, { id }: { id: string }) => {
+      try {
+        const user = await User.findById(id);
+        console.log('Found user:', user);
+        return user;
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        return null;
+      }
     },
 
     // Dog queries

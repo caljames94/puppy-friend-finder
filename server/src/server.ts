@@ -7,7 +7,7 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import { typeDefs, resolvers } from './schemas/index.js';
-import { authenticateToken } from './utils/auth.js';
+// import { authenticateToken } from './utils/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,8 +30,10 @@ const startApolloServer = async () => {
     app.use(express.json());
 
     app.use('/graphql', expressMiddleware(server, {
-        context: async ({ req }) => ({ user: authenticateToken(req) })
+        context: async () => ({ user: null })
+          // ({ user: authenticateToken(req) })
       }));
+      
 
     if (process.env.NODE_ENV === 'production') {
       app.use(express.static(path.join(__dirname, '../../client/dist')));

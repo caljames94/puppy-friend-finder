@@ -1,9 +1,9 @@
 import { Schema, model, Document } from 'mongoose';
 
 export enum MatchStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected'
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED'
 }
 
 // Interface for the Match document
