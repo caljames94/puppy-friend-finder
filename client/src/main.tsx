@@ -6,16 +6,21 @@ import App from './App.tsx'
 import Match from './pages/Match.tsx'
 import ErrorPage from './pages/Error.tsx'
 import MatchManagement from './pages/MatchManagement.tsx';
+import Login from './pages/Login.tsx';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
       index: true,
       element: <Match />
+      },
+      {
+        path: 'login',
+        element: <Login />
       },
       {
         path: "matches",

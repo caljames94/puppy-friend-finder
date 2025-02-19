@@ -48,6 +48,14 @@ interface UpdateDogInput {
   suburb?: string;
 }
 
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET_KEY;
+  if (!secret) {
+    throw new Error("JWT_SECRET_KEY is not set in the environment variables");
+  }
+  return secret;
+}
+
 export const resolvers: IResolvers = {
   Query: {
     // User queries
@@ -126,21 +134,21 @@ export const resolvers: IResolvers = {
       return await user.save();
     },
 
-    login: async ( _:any, { email, password }: { email: string; password: string }
+    login: async (_: any, { email, password }: { email: string; password: string }
     ): Promise<AuthPayload> => {
       const user = await User.findOne({ email });
       if (!user) {
-        throw new UserInputError("Invalid credentials");
+        throw new AuthenticationError("Invalid credentials");
       }
 
       const isValid = await user.isCorrectPassword(password);
       if (!isValid) {
-        throw new UserInputError("Invalid credentials");
+        throw new AuthenticationError("Invalid credentials");
       }
 
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET || "your-secret-key",
+        getJwtSecret(),
         { expiresIn: "1d" }
       );
 
