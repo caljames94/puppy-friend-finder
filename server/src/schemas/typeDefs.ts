@@ -106,6 +106,7 @@ export const typeDefs = gql`
     # Match mutations
     createMatch(dogA: ID!, dogB: ID!): Match!
     updateMatchStatus(matchId: ID!, dogId: ID!, status: MatchStatus!): Match!
+    deleteMatch(matchId: ID!): Boolean!
   }
 
   type AuthPayload {

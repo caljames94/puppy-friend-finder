@@ -20,7 +20,7 @@ const seedDatabase = async () => {
     const users: IUser[] = [];
     for (let i = 1; i <= 15; i++) {
       const user = new User({
-        name: `user${i}`,
+        name: ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Henry', 'Isabella', 'Jack'][Math.floor(Math.random() * 7)],
         email: `user${i}@example.com`,
         password: await bcrypt.hash('password123', 10),
       });
@@ -34,11 +34,11 @@ const seedDatabase = async () => {
     const suburbs = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Newcastle', 'Canberra', 'Wollongong', 'Hobart'];
     for (let i = 0; i < users.length; i++) {
       const dog = new Dog({
-        name: `Dog${i + 1}`,
+        name: ['Maple', 'Buddy', 'Max', 'Charlie', 'Lucy', 'Rex', 'Luna', 'Buddy', 'Socks', 'Rover'][Math.floor(Math.random() * 7)],
         age: Math.floor(Math.random() * 10) + 1,
         breed: breeds[Math.floor(Math.random() * breeds.length)],
         personality: ['Friendly', 'Playful', 'Energetic', 'Calm', 'Shy', 'Independent', 'Social'][Math.floor(Math.random() * 7)],
-        profilePicture: `https://example.com/dog${i + 1}.jpg`,
+        profilePicture: `https://placedog.net/${i+500}/500.jpg`,
         suburb: suburbs[Math.floor(Math.random() * suburbs.length)],
         owner: users[i]._id,
       });
