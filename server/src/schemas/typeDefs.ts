@@ -83,7 +83,6 @@ export const typeDefs = gql`
     
     # Dog queries
     getDog(id: ID!): Dog
-    getDogsBySuburb(suburb: String!): [Dog!]!
     getDogsForMatching(dogId: ID!): [Dog!]!
     
     # Match queries
@@ -101,7 +100,6 @@ export const typeDefs = gql`
     # Dog mutations
     createDog(input: CreateDogInput!): Dog!
     updateDog(id: ID!, input: UpdateDogInput!): Dog!
-    deleteDog(id: ID!): Boolean!
     
     # Match mutations
     createMatch(dogA: ID!, dogB: ID!): Match!
@@ -112,9 +110,5 @@ export const typeDefs = gql`
   type AuthPayload {
     token: String!
     user: User!
-  }
-
-  type Subscription {
-    matchUpdated(dogId: ID!): Match!
   }
 `;

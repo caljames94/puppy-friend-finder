@@ -5,6 +5,7 @@ import type { Request, Response } from 'express';
 import db from './config/connection.js'
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import cors from 'cors';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './utils/auth.js';
 
@@ -13,7 +14,8 @@ const __dirname = path.dirname(__filename);
 
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  introspection: true,
 });
 
 const startApolloServer = async () => {
@@ -24,11 +26,11 @@ const startApolloServer = async () => {
     const PORT = process.env.PORT || 3001;
     const app = express();
 
-    app.use(express.urlencoded({ extended: false }));
+    app.use(cors());
     app.use(express.json());
 
     app.use('/graphql', expressMiddleware(server, {
-        context: async ({ req }) => ({ user: authenticateToken(req)})
+        context: async ({ req }) => ({ user: authenticateToken(req) })
       }));
 
     if (process.env.NODE_ENV === 'production') {

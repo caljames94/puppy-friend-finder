@@ -1,15 +1,24 @@
 import { gql } from '@apollo/client';
 
-export const GET_DOGS = gql`
-  query GetDogs {
-    dogs {
-      _id
+export const PENDING_MATCHES_QUERY = gql`
+  query PendingMatches($dogId: ID!) {
+    getDog(id: $dogId) {
+      id
       name
-      age
-      breed
-      image
-      owner {
-        username
+      pendingMatches {
+        id
+        dogA {
+          id
+          name
+          profilePicture
+        }
+        dogB {
+          id
+          name
+          profilePicture
+        }
+        dogAStatus
+        dogBStatus
       }
     }
   }

@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.tsx'
 import Match from './pages/Match.tsx'
 import ErrorPage from './pages/Error.tsx'
+import MatchManagement from './pages/MatchManagement.tsx';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
       index: true,
       element: <Match />
+      },
+      {
+        path: "matches",
+        element: <MatchManagement/>
       }
     ]
   },

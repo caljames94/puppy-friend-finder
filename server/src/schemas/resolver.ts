@@ -65,10 +65,6 @@ export const resolvers: IResolvers = {
       return await Dog.findById(id).populate("owner");
     },
 
-    getDogsBySuburb: async (_, { suburb }: { suburb: string }) => {
-      return await Dog.find({ suburb }).populate("owner");
-    },
-
     getDogsForMatching: async (_, { dogId }: { dogId: string }) => {
       const dog = await Dog.findById(dogId);
       if (!dog) throw new UserInputError("Dog not found");
@@ -189,20 +185,6 @@ export const resolvers: IResolvers = {
       return await Dog.findByIdAndUpdate(id, input, { new: true }).populate(
         "owner"
       );
-    },
-
-    deleteDog: async (_:any, { id }: { id: string }, { user }: Context) => {
-      if (!user) throw new AuthenticationError("Not authenticated");
-
-      const dog = await Dog.findById(id);
-      if (!dog) throw new UserInputError("Dog not found");
-      if (dog.owner.toString() !== user.id)
-        throw new AuthenticationError("Not authorized");
-
-      await Dog.findByIdAndDelete(id);
-      await User.findByIdAndUpdate(user.id, { $unset: { dog: 1 } });
-
-      return true;
     },
 
     // Match mutations
