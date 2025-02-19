@@ -8,6 +8,7 @@ import ErrorPage from './pages/Error.tsx'
 import MatchManagement from './pages/MatchManagement.tsx';
 import Login from './pages/Login.tsx';
 import CreateProfile from './pages/CreateProfile.tsx';
+import CreateDogProfile from './pages/CreateDogProfile.tsx';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: '/create-profile',
         element: <CreateProfile/>
+      },
+      {
+        path: '/create-dog-profile',
+        element: <CreateDogProfile/>
       },
       {
         path: '/matches',

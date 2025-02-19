@@ -26,7 +26,7 @@ const CreateProfile: React.FC = () => {
         });
 
         Auth.login(data.register.token);
-        navigate('/'); //update this to the create dog profile page after successful registration
+        navigate('/create-dog-profile');
     } catch (e) {
         console.error(e);
     }

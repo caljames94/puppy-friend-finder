@@ -84,6 +84,7 @@ export const typeDefs = gql`
     # Dog queries
     getDog(id: ID!): Dog
     getDogsForMatching(dogId: ID!): [Dog!]!
+    getAllDogs: [Dog!]!
     
     # Match queries
     getMatch(id: ID!): Match

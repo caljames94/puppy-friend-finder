@@ -23,3 +23,22 @@ export const PENDING_MATCHES_QUERY = gql`
     }
   }
 `;
+
+export const GET_DOGS = gql`
+  query GetAllDogs {
+    getAllDogs {
+      _id
+      name
+      age
+      breed
+      personality
+      profilePicture
+      suburb
+      owner {
+        _id
+        name
+        email
+      }
+    }
+  }
+`;

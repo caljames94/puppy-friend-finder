@@ -35,3 +35,27 @@ export const REGISTER = gql`
   }
 `;
 
+export const CREATE_DOG = gql`
+  mutation CreateDog($name: String!, $age: Int!, $breed: String!, $personality: [String!]!, $profilePicture: String!, $suburb: String!) {
+    createDog(input: {
+      name: $name,
+      age: $age,
+      breed: $breed,
+      personality: $personality,
+      profilePicture: $profilePicture,
+      suburb: $suburb
+    }) {
+      _id
+      name
+      age
+      breed
+      personality
+      profilePicture
+      suburb
+      owner {
+        _id
+        name
+      }
+    }
+  }
+`;

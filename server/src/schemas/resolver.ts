@@ -80,6 +80,16 @@ export const resolvers: IResolvers = {
       return await Dog.findById(id).populate("owner");
     },
 
+    getAllDogs: async () => {
+      try {
+        const dogs = await Dog.find().populate("owner");
+        return dogs;
+      } catch (error) {
+        console.error('Error fetching all dogs:', error);
+        throw new Error('Failed to fetch dogs');
+      }
+    },
+
     getDogsForMatching: async (_, { dogId }: { dogId: string }) => {
       const dog = await Dog.findById(dogId);
       if (!dog) throw new UserInputError("Dog not found");
