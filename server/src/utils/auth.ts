@@ -6,30 +6,28 @@ dotenv.config();
 
 export const authenticateToken = ({ req }: any) => {
   // Allows token to be sent via req.body, req.query, or headers
-  let token = req.body.token || req.query.token || req.headers.authorization;
+  let token = req?.body?.token || req?.query?.token || req?.headers?.authorization;
 
   // If the token is sent in the authorization header, extract the token from the header
-  if (req.headers.authorization) {
+  if (req?.headers?.authorization) {
     token = token.split(' ').pop().trim();
   }
 
-  // If no token is provided, return the request object as is
+  // If no token is provided, return null
   if (!token) {
-    return req;
+    return null;
   }
 
   // Try to verify the token
   try {
-    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '', { maxAge: '2hr' });
-    // If the token is valid, attach the user data to the request object
-    req.user = data;
+    const { data }: any = jwt.verify(token, process.env.JWT_SECRET_KEY || '');
+    // If the token is valid, return the user data
+    return data;
   } catch (err) {
-    // If the token is invalid, log an error message
+    // If the token is invalid, log an error message and return null
     console.log('Invalid token');
+    return null;
   }
-
-  // Return the request object
-  return req;
 };
 
 export const signToken = (name: string, email: string, _id: unknown) => {
